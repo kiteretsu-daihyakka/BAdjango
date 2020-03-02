@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log-in admin</title>
+    {% load staticfiles %}
+    <link href="{% static 'admm/mycss/index.css' %}" rel="stylesheet" type="text/css" >
+    <style>
+        form{
+            width:200px;
+            background-color:powderblue;
+        }
+        button{
+            width:inherit;
+        }
+        input{
+            width:180;
+        }
+    </style>
+</head>
+{% include 'admm/header.html' %}
+<article>
+    <form action="/adminsite/newpwd/" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Old password</label>
+        <input type="password" name="passwrd" required><br>
+        <label>Security Question</label><br>
+        <input type="text" name="secque" required><br>
+        <label>Answer :</label><br>
+        <input type="text" name="secans" required><br>
+        <!--<button>Send code</button><br><br>-->
+        <!--<label> Enter Code</label>-->
+        <!--<input type="text"><br>-->
+        <button type="submit">Submit</button>
+    </form>
+    <br>
+    {% for message in messages %}
+        {{message}}
+    {% endfor %}
+</article>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>log out page</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'admm/fontawesome-free-5.12.0-web/css/all.css' %}">
+    <link href="{% static 'admm/mycss/index.css' %}?{% now 'U' %}" type='text/css' rel="stylesheet" />
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'admm/adminJquery.js' %}" rel="script"></script>
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+<article>
+    <h1>Logout Page</h1>
+    <div style="margin:100px 300px;">
+        <p>You are already logged in!</p><br>
+        <a href="{% url 'login:logout' %}" style="color:green;">Click here to log out..</a>
+    </div>
+</article>
+</html>

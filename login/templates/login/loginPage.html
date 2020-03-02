@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    {% load staticfiles %}
+    <link href="{% static 'admm/mycss/index.css' %}" rel="stylesheet" type="text/css" >
+</head>
+<style>
+        form{
+            text-align:center;
+            margin-top:100px;
+            margin-left:220px;
+            <!--background-color:white;-->
+        }
+        button{
+            width:inherit;
+        }
+        input{
+            width:300px;
+            height:30px;
+        }
+    </style>
+{% include 'admm/header.html' %}
+<article style="margin:0px;">
+    <div style="width:100%;text-align:center;margin-top:60px;">
+    <h1 style="margin:0px;font-size:35px;">Login Page</h1>
+    <div style="margin-left:520px;margin-top:30px;">
+    <form action='' method='post' enctype='multipart/form-data' style="margin:0px;">
+        {% csrf_token%}
+        <table>
+            <tr>
+                <td colspan="2"><input type='email' placeholder="Email Address" name="email" required> <br><br></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="password" placeholder="Password" name="password" required><br><br>
+                </td>
+            </tr>
+            <tr>
+                <td>Forgot password pal??<br> &nbsp;Don't worry, <a href="{% url 'login:frgtPwd' %}" style="color:green;">Click here!</a></td>
+                <td><button type="submit" style="width:105px;height:45px;margin-left:20px;font-size:18px;">Login</button></td>
+            </tr>
+            {% for message in messages %}
+            <tr>
+                <td colspan="2" style="color:red"><br>{{message}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <div style="text-align:center;">
+            <!--{% for error in field.errors%}-->
+                <!--<p>{{error|escape}}</p>-->
+            <!--{% endfor%}-->
+
+            <!--{% for error in field.non_field_errors%}-->
+                <!--<p>{{error|escape}}</p>-->
+            <!--{% endfor%}-->
+
+
+        </div>
+        <!--<a href="/login/frgtPwd/">Forgot password</a>-->
+        <!--<br><br><br><br>-->
+        <!--<h1>Log In</h1>-->
+        <!--<form action='' method='post' enctype='multipart/form-data'>-->
+            <!--{% csrf_token %}-->
+            <!---->
+            <!--<button type='submit' id='subBtn'>Submit</button>-->
+        <!--</form>-->
+        <!--<button type="submit">Log in</button>-->
+    </form>
+        </div>
+            </div>
+    <br>
+</article>
+</html>

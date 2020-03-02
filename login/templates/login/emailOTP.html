@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enter OTP</title>
+    {% load staticfiles %}
+    <link href="{% static 'admm/mycss/index.css' %}" rel="stylesheet" type="text/css" >
+</head>
+{% include 'admm/header.html' %}
+<article>
+    <h4>
+        Your code has been sent to <span style="font-weight:bold;">{{email}}</span>
+    </h4>
+    <form>
+        <input type="text" required placeholder="Enter OTP"><br>
+        <button type="submit">Submit</button>
+    </form>
+</article>
+</html>
