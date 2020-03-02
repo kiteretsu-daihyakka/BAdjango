@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Advertisements</title>
+    {% load staticfiles %}
+    <link href="{% static 'admm/mycss/index.css' %}?{% now 'U' %}" type='text/css' rel="stylesheet" />
+    <link href="{% static 'admm/mycss/universal.css' %}?{% now 'U' %}" type='text/css' rel="stylesheet" />
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'admm/adminJquery.js' %}?{% now 'U' %}"></script>
+    <style>
+        .titles{
+            width:100%;
+            height:50px;
+            border:1px solid black;
+            cursor:pointer;
+            text-align:center;
+        }
+        .advertisements{
+            text-align:center;
+        }
+        .advertisements th{
+            background-color:lightgray;
+            padding-right:10px;
+            <!--border:1px solid black;-->
+         }
+        #packOffer{
+            width:100%;
+            direction:rtl;
+        }
+        #packOffer td{
+            <!--border:1px solid black;-->
+            width:160px;
+            height:40px;
+            text-align:center;
+            cursor:pointer;
+        }
+        #optionsTbl{
+            width:100%;
+        }
+        #offrBtnInception,#packBtnInception{
+            font-weight:bold;
+            background-color:lightgray;
+            cursor:pointer;
+        }
+    </style>
+
+
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+<article >
+    {% for message in messages %}
+        <p>{{message}} <a href="{% url 'admm:listadv' %}">Ok</a></p>
+    {% endfor %}
+    <!--<div class=".pipeLine">-->
+        <!--{{pipeAdv}}-->
+    <!--</div>-->
+    <div style="text-align:center;width:100%;background-color:white;margin-top:-9px;">
+                <h2 style="margin-right:250px;">Advertisement</h2>
+    </div>
+        <form method="post" enctype="multipart/form-data" action="{% url 'admm:pack_create' %}" style="">
+            {% csrf_token %}
+<div style="position:fixed;border:1px solid black;margin:100px 400px;" id="packCreate" hidden>
+            <table style="border:1px solid black;background-color:lightgray;">
+                <tr>
+                    <td colspan="4" ></td>
+                </tr>
+                <tr>
+                    <th colspan="4"><span id="packHeading">Package</span> <span id="offerHeading">Offer</span> <span style="text-align:right;cursor:pointer;" id="closePackPopUp">&times;</span></th>
+                </tr>
+                <tr>
+                    <td><label>Description</label></td>
+                    <td><input name="description" type="text"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label>Start Date</label></td>
+                    <td><input type="date" name="startdate"></td>
+                    <td><label>End Date</label></td>
+                    <td><input type="date" name="enddate"></td>
+                </tr>
+                <tr>
+                    <td><label>Discount</label></td>
+                    <td><input type="number" style="width:150px;" name="discount"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="direction:rtl;"> <button style="width:60px;height:35px;">Save</button> <button style="width:150px;height:35px;">See Advertisement</button></td>
+                </tr>
+            </table>
+            <input type="number" value=1 name="isPack" id="id_isPack" hidden>
+            <input type="number" name="selectedAdvCnt" id="id_selectedAdvCnt" hidden value=0>
+    </div>
+    <table class="titles">
+        {% if user.is_staff == 1 %}
+            <tr>
+                <th class="owned" style="border-right:1px solid black;{% if OwnedOnes %}background-color:lightgray;color:green;font-weight:bold;{%endif%}">OWNED</th>
+                <th class="others" style="{% if OwnedOnes is False %}background-color:lightgray;color:green;font-weight:bold;{%endif%}">OTHERS</th>
+            </tr>
+        {% else %}
+            <tr>
+                <th class="verified" style="border-right:1px solid black;">Verified</th>
+                <th class="unverified">Unverified</th>
+            </tr>
+        {% endif %}
+    </table>
+    {% if OwnedOnes %}
+        <div id="packOffer">
+            <table id="optionsTbl" style="margin-bottom:30px;">
+                <tr>
+                    <td id="offrBtn"><button id="offrBtnInception" type="button">Create Offer</button></td>
+                    <td id="packBtn"><button id="packBtnInception" type="button" style="margin-right:-70px;">Create Package</button></td>
+                    <td style="text-align:left;border:none;width:60%;"><button type="button" id="showChckBoxes" style="font-weight:bold;background-color:lightgray;cursor:pointer;margin-left:0px;">Select Advertisements</button></td>
+                </tr>
+            </table>
+        </div>
+
+    <div style="width:130px;cursor:pointer;text-align:center;">
+            <a href="{% url 'admm:advcreatenew' %}" style="text-decoration:underline;color:green;" >Add New</a><br><br>
+        </div>
+    {% endif %}
+
+    {% if advObjs.count == 0 %}
+        <p>No advertisements</p>
+    {% else %}
+
+
+
+    <table class="advertisements" cellspacing="0">
+        <tr >
+            <th style="border:none;"></th>
+            <th>View</th>
+            {% if OwnedOnes %}
+                <th>Edit</th>
+                <th>Delete</th>
+            {% endif %}
+            <th>Image</th>
+            <th>Height</th>
+            <th>Width</th>
+            <th style="padding-top:20px;">Registration No.</th>
+            <th style="width:220px;">Address</th>
+            <!--<th style="width:80px;">Max Days of booking</th>-->
+            <th>Subcategory</th>
+            <th>Area</th>
+            <th>City</th>
+            <th style="padding-top:20px;">Minimum quantity</th>
+            <th>Stock</th>
+            <th>Owner</th>
+        </tr>
+            {% for adv in advObjs %}
+            <tr>
+                <td><input type="checkbox" name="selectedAdv{{forloop.counter}}" value="{{adv.advid}}"  hidden></td>
+                <td style="width:25px;"><a href="{% url 'admm:adv_detail' adv.advid %}"><i class="fa fa-eye"></i></a></td>
+                {% if OwnedOnes %}
+                    <td style="width:25px;" ><a id="editAdvLink" href="{% url 'admm:adv_edit' adv.advid %}"><i class="fa fa-edit"></i></a></td>
+                    <td style="width:25px;" ><a id="delAdvLink"  href="{% url 'admm:adv_del' adv.advid %}"><i class="fa fa-trash"></i></a></td>
+                {% endif %}
+                <td><img src="/media/{{adv.defaultimgpath}}" height="100px" width="100px;" alt="advImg"></td>
+                <td>{{adv.height}}</td>
+                <td>{{adv.width}}</td>
+                <td>{%if adv.advregno is None %}-{%else%}{{adv.advregno}}{%endif%}</td>
+                <td>{%if adv.addressline1 is None %}-{%else%}{{adv.addressline1}}{%endif%}</td>
+                <!--<td>{{adv.maxdays}}</td>-->
+                <td>{{adv.subcategory_subcatid}}</td>
+                <td>{%if adv.area_areaid is None %}-{%else%}{{adv.area_areaid}}{%endif%}</td>
+                <td>{%if adv.city_cityid is None %}-{%else%}{{adv.city_cityid}}{%endif%}</td>
+                <td>{%if adv.minquantity is None %}-{%else%}{{adv.minquantity}}{%endif%}</td>
+                <td>{%if adv.stock is None %}-{%else%}{{adv.stock}}{%endif%}</td>
+                <td>{{adv.auth_user}}</td>
+                <!--<td><input type="number" id="id_checkedAdvQn" name="checkedAdvQn" hidden></td>-->
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    </form>
+    <br>
+
+    <form action="{% url 'admm:listadv' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="number" id="id_isowned" name="isowned" value=1 hidden>
+        <button id="submitClick" type="submit" hidden></button>
+    </form>
+</article>
+</html>

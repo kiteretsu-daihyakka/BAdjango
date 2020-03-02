@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Categories</title>
+    <style>
+        table td{
+            border:0px; solid black;
+        }
+        .cat_Name,.scat_Name,.commission{
+            border:None;
+            outline:none;
+            height:25px;
+        }
+        h3{
+            color:green;
+        }
+        #categoriesTitles{
+            height:50px;
+            width:90%;
+            text-align:center;
+        }
+        .catName{
+            cursor:pointer;
+        }
+        #categoriesTitles td{
+            width:300px;
+            border:1px solid black;
+        }
+        .CatOpts{
+            float:right;
+        }
+        #subCatListTbl{
+            width:90%;
+            text-align:center;
+        }
+        #subCatListTbl td th{
+
+        }
+        .catUpdtInput{
+
+        }
+    </style>
+    {% load staticfiles %}
+
+    <link rel="stylesheet" href="{% static 'admm/fontawesome-free-5.12.0-web/css/all.css' %}">
+    <!--<link href="{% static 'admm/css/bootstrap.min.css' %}" type='text/css' rel="stylesheet" />-->
+    <link href="{% static 'admm/mycss/index.css' %}?{% now 'U' %}" type='text/css' rel="stylesheet" />
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'admm/adminJquery.js' %}" rel="script"></script>
+    <script>
+        $(document).ready(function(){
+            $('.delCat').click(function(){
+                if(confirm('You pressed delete!, sure to delete the item?')==false)
+                    return;
+                $.ajax({
+                    url:"{% url 'admm:categoryDel' %}",
+                    data:{
+                        'id':$(this).parent().siblings('.categoryId').val(),
+                    },
+                    dataType:'json',
+                    success:function(data){
+                        if(data['result']==1){
+                            alert('Category Deleted successfully.');
+                            $(ele).parent().parent().remove();
+                        }
+                        else{
+                            alert("Could't delete it. Either Because It's used somewhere else so first delete those entries Or other kind of an error occurred..");
+                        }
+                    },
+                });
+            });
+            $('#categoriesTitles td').mouseover(function(){
+                $(this).children('.CatOpts').show();
+            });
+            $('#categoriesTitles td').mouseout(function(){
+                $(this).children('.CatOpts').hide();
+            });
+            $('.cat_Name,.scat_Name,.commission').dblclick(function(){
+                $(this).css('border','1px solid black');
+                $(this).prop('readonly',false);
+            });;
+            $('.cat_Name').change(function(){
+                var tmp=$(this).next('a').attr('href');
+                $(this).next('a').attr('href',tmp+$(this).val());
+                $(this).next('a')[0].click();
+            });
+            $('.selectCat').change(function(){
+                window.location.replace('/adminsite/categories/'+$(this).val());
+            })
+            $('.scat_Name,.commission').change(function(){
+                $(this).next('button').click();
+            });
+            $('#catNewLink').click(function(){
+                $('#catNew').slideToggle('fast');
+            });
+            $('#newScatLink').click(function(){
+                $('#newSubCatInputs').slideToggle('fast');
+            });
+            $('.subCatDel').click(function(){
+                alert();
+            });
+            $('.catName').click(function(){
+                $('#selectToSee').hide();
+                $('#newScatLink').show();
+                $('#categoriesTitles td').css('background-color','white');
+                $(this).parent().css('background-color','lightgray');
+                var catId=$(this).siblings('.categoryId').val();
+                <!--alert(catId);-->
+                $.ajax({
+                    url:"{% url 'admm:subCatsDD' %}",
+                    data:{
+                        'id':catId,
+                    },
+                    dataType:'json',
+                    success: function (data){
+                        console.log(data);
+                        $('#nullSubCats').hide();
+                        $('.subCat').remove();
+                        if(data['subCats'].length==0){
+                            $('#nullSubCats').show();
+                            return;
+                        }
+                        $('#subCatListTbl').append("<tr class='subCat'><th style='width:300px;'>Subcategory</th><th style='width:300px;'>Commission (%)</th><th style='width:300px;'></th></tr>");
+                        for(var i=0;i<data['subCats'].length;i++){
+                            $('#subCatListTbl').append("<tr class='subCat' onmouseover='tmp(this)' onmouseout='tmpOut(this)' style='height:50px;'><td class='scatname'>"+data['subCats'][i]['subcatname']+"</td><td class='camishan'>"+data['subCats'][i]['commission']+"</td><td class='scatoptions'><a onclick='showUpdtInputs(this)' hidden><i class='fas fa-edit'></i></a> <a class='subCatDel' onclick='delSubcat(this)' hidden><i class='fas fa-trash'></i></a></td><td class='scatIdStoring' hidden>"+data['subCats'][i]['id']+"</td></tr>");
+                        }
+                        $('#subCatListTbl').append("<tr id='newSubCatInputs' class='subCat' hidden><td><input class='catIdInput' type='number' value='"+data['catid']+"' hidden><input type='text' class='subCatNameInput'></td><td><input type='number' class='commissionInput'></td><td><button onclick='saveSubcat(this)'>Insert</button></td></tr>");
+                    }
+                });
+            });
+            $('.editCat').click(function(){
+                $(this).parent().parent().parent().find(".catUpdtInput").hide();
+                $(this).parent().parent().find(".catUpdtInput").toggle();
+            });
+            $('.cancelUpdatingCat').click(function(){
+                $(this).parent().hide();
+            });
+            $('.updateCatBtn').click(function(e){
+                var catName=$(this).siblings('.updtInputCat').val().trim();
+                if(catName==$(this).parent().siblings('.catName').text().trim())
+                    return;
+                var id=parseInt($(this).parent().siblings('.categoryId').val().trim());
+                $.ajax({
+                    url:"{% url 'admm:categoryEdit' %}",
+                    data:{
+                        'id':id,
+                        'catName':catName,
+                    },
+                    dataType:'json',
+                    success: function (data){
+                        if(data['result']==1){
+                            alert('Updated successfully');
+                            $(this).parent().css('background-color','yellow');
+                            $(this).parent().siblings('.catName').text(catName);
+                        }
+                        else{
+                            alert('Error updating category');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+    function tmp(el){
+            <!--$(el).css('background-color','lightgreen');-->
+            if($(el).children('.scatoptions').find('input').length==0)
+                $(el).children('.scatoptions').find('a').show();
+        }
+        function tmpOut(el){
+            <!--$(el).css('background-color','white');-->
+            $(el).children('.scatoptions').find('a').hide();
+        }
+        function hideUpdtInputs(el){
+            $(el).parent().children('a').show();
+            $(el).parent().siblings().children('input').remove();
+            $(el).parent().children('input').remove();
+        }
+        function showUpdtInputs(el){
+                <!--$(el).parent().siblings('.scatname').find('input').remove();-->
+                var scat=$(el).parent().siblings('.scatname').text().trim();
+                var cmsn=parseFloat($(el).parent().siblings('.camishan').text());
+                $(el).parent().siblings('.scatname').append("<br><input class='nameUpdtFld' type='text' value='"+scat+"'>");
+                $(el).parent().siblings('.camishan').append("<br><input class='cmishanUpdtFld' type='number' value='"+cmsn+"'>");
+                $(el).parent().append("<input type='button' onclick='updateScategory(this)' value='Update'> <input type='button' value='Cancel' onclick='hideUpdtInputs(this)'>");
+                $(el).parent().children('a').hide();
+            }
+        function updateScategory(ele){
+            var newName=$(ele).parent().siblings('.scatname').find('.nameUpdtFld').val().trim();
+            var newCmishan=parseFloat($(ele).parent().siblings('.camishan').find('.cmishanUpdtFld').val().trim());
+            var oldName=$(ele).parent().siblings('.scatname').text().trim();
+            var oldCmishan=parseFloat($(ele).parent().siblings('.camishan').text().trim());
+            <!--alert(newName+' '+newCmishan+' '+oldName+' '+oldCmishan);-->
+            if (newName==oldName)
+                newName='';
+            if (newCmishan==oldCmishan)
+                newCmishan='';
+            if (newName==newCmishan)
+                return;
+            scat_id=parseInt($(ele).parent().siblings('.scatIdStoring').text());
+            $.ajax({
+                url:'{% url 'admm:subcategoryedit' %}',
+                data:{'sid':scat_id,'new_name':newName,'new_cmishan':newCmishan},
+                dataType:'json',
+                success:function(data){
+                    if(data['result']==1){
+                        alert('Updated successfully.');
+                        if (data['hasNameUpdtd']==1)
+                            $(ele).parent().siblings('.scatname').text(newName);
+                        if (data['hasCmsnUpdtd']==1)
+                            $(ele).parent().siblings('.camishan').text(newCmishan);
+                        $(ele).parent().siblings('.scatname,.camishan').find('input').remove();
+                        $(ele).parent().children('input').remove();
+                    }
+                    else{
+                        alert("Could't Update it. An error occurred..");
+                    }
+                },
+            });
+        }
+        function delSubcat(ele){
+                var scatname=$(ele).parent().siblings('.scatname').text().trim();
+                $.ajax({
+                    url:'{% url 'admm:subcatdel' %}',
+                    data:{
+                        'scat_name':scatname,
+                    },
+                    dataType:'json',
+                    success:function(data){
+                        if(data['result']==1){
+                            alert('Subcategory Deleted successfully.');
+                            $(ele).parent().parent().remove();
+                        }
+                        else{
+                            alert("Could't delete it. Either Because It's used somewhere else so first delete those entries Or something else error occur..");
+                        }
+                    },
+                });
+        }
+        function saveSubcat(ele){
+                var scatname=$('.subCatNameInput').val().trim();
+                var cmsn=parseFloat($('.commissionInput').val().trim());
+                var catId=$('.catIdInput').val();
+                $.ajax({
+                    url:'{% url 'admm:subCatSave' %}',
+                    data:{
+                        'scat_name':scatname,
+                        'cmsn':cmsn,
+                        'category_id':catId,
+                    },
+                    dataType:'json',
+                    success:function(data){
+                        if(data['result']==1){
+                            alert('Subcategory Added successfully.');
+                            $(ele).parent().parent().remove();
+                            $('#subCatListTbl').append("<tr class='subCat' onmouseover='tmp(this)' onmouseout='tmpOut(this)' style='height:50px;'><td class='scatname'>"+scatname+"</td><td class='camishan'>"+cmsn+"</td><td class='scatoptions'><a onclick='showUpdtInputs(this)' hidden><i class='fas fa-edit'></i></a> <a class='subCatDel' onclick='delSubcat(this)' hidden><i class='fas fa-trash'></i></a></td></tr>");
+                        }
+                        else{
+                            alert('Error adding the subcategory.');
+                        }
+                    },
+                });
+        }
+    </script>
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+<article >
+    <!--<table class="titles" cellspacing="0" style="width:100%;">-->
+        <p class="subCatEdit"></p>
+        <h3>Categories</h3>
+        <a id="catNewLink" style="color:green;text-decoration:underline;">Add New</a>
+        <form id="catNew" action="" method="post" hidden>
+            {% csrf_token %}
+            {{cat_form.as_table}}
+            <button type="submit" style="height:23px;width:100px;">Insert</button>
+        </form>
+        <br>
+        <table id="categoriesTitles">
+            <tr>
+            {% for object in objects %}
+                <td>
+                    <span class="catName">{{object.categoryname}}</span>
+                    <input class="categoryId" value="{{object.id}}" type="number" hidden>
+                    <span class="CatOpts" hidden>
+                        <a class="editCat"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                        <a class="delCat" ><i class="fas fa-trash" aria-hidden="true"></i></a>
+                    </span>
+                    <br>
+                    <span class="catUpdtInput" hidden>
+                        <input class="updtInputCat" type='text' value="{{object.categoryname}}" >
+                        <button class="updateCatBtn">Update</button>
+                        <button class="cancelUpdatingCat">Cancel</button>
+                    </span>
+                </td>
+            {% endfor %}
+        </tr>
+        </table>
+
+        <br>
+        <br>
+        <h3>Subcategories</h3>
+        <p id="newScatLink" hidden ><a style="color:green;text-decoration:underline;">Add new</a></p>
+        <p id="selectToSee">Select a category first..</p>
+        <p id="nullSubCats" hidden>No subcategories</p>
+        <table id="subCatListTbl" cellspacing="0">
+
+        </table>
+        <br>
+</article>
+</html>

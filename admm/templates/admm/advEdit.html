@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adv Detail</title>
+    {% load staticfiles %}
+    <style>
+        #advImages img{
+            height:150px;
+            width:150px;
+        }
+        h1{
+            color:darkblue;
+            font-size:25px;
+        }
+        #advDetail th{
+            text-align:left;
+        }
+    </style>
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <link href="{% static 'admm/mycss/univeral.css' %}?{% now 'U' %}" type='text/css' rel="stylesheet" />
+    <script>
+        $(document).ready(function(){
+            $('#sbmtCopyBtn').click(function(){
+                $('#id_DWPcount').val($('.dwpRow').length);
+                $('#saveAdvFirstCopy').click();
+            });
+            $('#plsImgIcn').click(function(){
+                var cnt=parseInt($('#for_advImg_loopId').val())+1;
+                $('#imgsHolder').append("<input class='advImgUpld' type='file' accept='images/*' name='advimg"+ cnt.toString() +"'></input><br>");
+                $('#for_advImg_loopId').val(cnt);
+             });
+             $('.delImg').click(function(){
+                $(this).next('img').hide();
+                document.getElementById('id_imgsList').value+='?'+$(this).next('img').attr('alt');
+                $(this).hide();
+             });
+        });
+    </script>
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+<article>
+
+    <h1 style="color:green;text-align:center;">Edit Advertisement Detail</h1>
+    <form action="{% url 'admm:adv_save' advObj.advid %}" method="get" enctype="multipart/form-data">
+        {% csrf_token %}
+
+    <table>
+        <tr>
+            <td><button id="saveAdvFirstCopy" type="submit" hidden>Save It</button></td>
+            <td><button id="sbmtCopyBtn" type="button">Save Advertisement</button> </td>
+        </tr>
+    </table>
+    <table id="advImages">
+        <tr>
+            <th><h1>IMAGES</h1></th>
+        </tr>
+        <tr>
+            {% for advImgObj in advImgObjects %}
+            <td><span class="delImg" style="font-size:20px;">&times;</span><img src="{{advImgObj.adv_img.url}}" alt="{{advImgObj.adv_img}}"></td>
+            {% endfor%}
+        </tr>
+    </table>
+         <div id="imgsHolder" style="">
+            <input type="file"  accept="image/*" class="advImgUpld" name="advimg0" oninvalid="this.setCustomValidity('Select atleast one image')" >
+            <span id="plsImgIcn" style="margin-top:44px;cursor:pointer;">&plus;</span><br>
+             <input type="text" value="bingo" id="id_imgsList" name="imgsList" hidden>
+             <input id="for_advImg_loopId" hidden value=0>
+        </div>
+    <table id="advDetail">
+        <tr>
+            <th colspan="2"><h1>ADVERTISEMENT DETAIL</h1></th>
+        </tr>
+        {% if catid == 1  %}
+        <tr>
+            <th>Registration No.</th>
+            <td><input type="text" name="regno" value="{{advObj.advregno}}" required></td>
+        </tr>
+        {% endif %}
+        <tr>
+            <th>Height</th>
+            <td><input type="number" name="height" value="{{advObj.height}}" required></td>
+        </tr>
+        <tr>
+            <th>Width</th>
+            <td><input type="number" name="width" value="{{advObj.width}}" required></td>
+        </tr>
+        <!--<tr>-->
+            <!--<th>Max Days of booking</th>-->
+            <!--<td><input type="number" name="maxdays" value="{{advObj.maxdays}}" required></td>-->
+        <!--</tr>-->
+
+        {% if catid == 1  %}
+            <tr>
+                <th>Address</th>
+                <td>
+                    <input  name="address" value="{{advObj.addressline1}}" required>
+                </td>
+            </tr>
+            <tr>
+                <th>Area</th>
+                <td>
+                   <select name="area" required>
+                        {% for area in areaObjects %}
+                            {% if area.areaname == advObj.area_areaid.areaname %}
+                                <option value="{{area.id}}" selected>{{area.areaname}}</option>
+                            {% else %}
+                                <option value="{{area.id}}">{{area.areaname}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <th>City</th>
+                <td>
+                    <select name="city" required>
+                        {% for city in cityObjects %}
+                            {% if city.cityname == advObj.city_cityid.cityname %}
+                                <option value="{{city.id}}" selected>{{city.cityname}}</option>
+                            {% else %}
+                                <option value="{{city.id}}">{{city.cityname}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Minimum order limit</th>
+                <td><input type="number" name="min_qn" value={{advObj.minquantity}} required></td>
+            </tr>
+            <tr>
+                <th>Stock</th>
+                <td><input type="number" name="stock" value="{{advObj.stock}}" required></td>
+            </tr>
+        {% endif %}
+
+        <tr>
+            <th>Subcategory</th>
+            <td>
+                <select name="subcategory" required>
+                        {% for subCat in subCatObjects %}
+                            {% if subCat.subcatname == advObj.subcategory_subcatid.subcatname %}
+                                <option value="{{subCat.id}}" selected>{{subCat.subcatname}}</option>
+                            {% else %}
+                                <option value="{{subCat.id}}">{{subCat.subcatname}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+            </td>
+        </tr>
+
+
+    </table>
+    <table style="text-align:center;">
+        <tr>
+            <th colspan="2"><h1>PRICING INFO</h1></th>
+        </tr>
+        <tr>
+            <th>Days</th>
+            <th>Price</th>
+        </tr>
+        {% for priceObj in priceObjects %}
+            <tr class="dwpRow">
+                    <td><input  name="day{{forloop.counter}}" type="number"  value={{priceObj.noofdays}} required></td>
+                    <td><input  name="price{{forloop.counter}}" type="number" value={{priceObj.price}} required></td>
+            </tr>
+            <!--funcIncreamentDWP()-->
+        {% endfor%}
+    </table>
+        <input type="number" id="id_DWPcount" name="DWPcount" value=0 hidden>
+    </form>
+</article>
+</html>

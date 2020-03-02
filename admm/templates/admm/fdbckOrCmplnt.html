@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Feedbacks,Complaints Detail</title>
+    <style>
+        .head td{
+            border:1px solid black;
+            background-color:lightgray;
+        }
+        .respondBtn{
+            width:60px;
+            height:35px;
+        }
+        .listTbl{
+            height:140px;
+            text-align:center;
+            border-collapse:separate;
+            border-spacing:0 15px;
+            width:100%;
+
+        }
+    </style>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'admm/fontawesome-free-5.12.0-web/css/all.css' %}">
+    <!--<link href="{% static 'admm/css/bootstrap.min.css' %}" type='text/css' rel="stylesheet" />-->
+    <!--<link href="{% static 'admm/mycss/index.css' %}" type='text/css' rel="stylesheet" />-->
+    <!--<link href="{% static 'admm/mycss/universal.css' %}" type='text/css' rel="stylesheet" />-->
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <script>
+        $(document).ready(function(){
+            $('.rspnsForm').on('submit',function(e){
+                    e.preventDefault();
+
+                    var rspns=$(this).children('.responseTxt').val();
+                    var ordrId=$(this).children('.ordrId').val();
+                    var row_id=($(this).parent().attr('id').match(/(\d+)/))[0];
+                    var tdId='td_'+row_id.toString();
+                    var trId='tr_'+row_id.toString();
+                    var dtime=$('#'+trId).children('.datetime').html();
+                    alert(dtime);
+                    $.ajax({
+                        {% if objname == 'feedbacks' %}
+                        url:"{% url 'admm:fdbk_save' 1 %}",
+                        {% else %}
+                        url:"{% url 'admm:fdbk_save' 0 %}",
+                        {% endif %}
+                        data:{
+                            'rspns':rspns,
+                            'id':ordrId,
+                            'dtime':dtime,
+                        },
+                        dataType:'json',
+                        success: function (data){
+                            $('#'+tdId).parent().append("<td>"+data.rspns+"</td><td>"+data.datetime+"</td><td>{{user.first_name}} {{user.last_name}}</td>");
+                            $('#'+tdId).remove();
+                            alert(data.datetime);
+                        }
+                    });
+            });
+        });
+    </script>
+    <script>
+        function myFunc(){
+
+        }
+    </script>
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+<article>
+    <h2>List of {{objname}} </h2>
+    <table class="listTbl" style="" cellspacing="0">
+        <tr class="head">
+            <td><h4>User Name</h4></td>
+            <td><h4>Id</h4></td>
+            <td><h4>Date & Time</h4></td>
+            <td><h4>{% if objname == 'feedbacks' %}Feedback{% else %}Complaint{% endif %}</h4></td>
+            {% if objname == 'feedbacks' %}
+            <td><h4>Rating</h4></td>
+            {%endif%}
+            <td><h4>Response</h4></td>
+            <td><h4>Responded Date</h4></td>
+            <td><h4>Responded By</h4></td>
+        </tr>
+        {% for obj in object_list %}
+        <tr id="tr_{{forloop.counter}}">
+            <td style="text-align:center;">{{obj.id.auth_user}}</td>
+            <td style="text-align:center;"><a href="{% url 'admm:ordr_detail' obj.id %}">{{obj.id}}</a></td>
+            <td style="text-align:center;" class="datetime">{{obj.datetime}}</td>
+            <td style="padding-left:10px;">{{obj.description}}</td>
+            {% if objname == 'feedbacks' %}
+            <td style="text-align:center;">{{obj.rating}}</td>
+            {%endif%}
+            {% if obj.resDatetime is None %}
+            <td colspan="3" id="td_{{forloop.counter}}">
+                <form class="rspnsForm" enctype="multipart/form-data" method="post">
+                    {% csrf_token %}
+                    <textarea class="responseTxt" required placeholder="Response" style="width:200px;resize:none;"></textarea>
+                    <button class="respondBtn" type="submit" style="">Submit</button>
+                    <input class="ordrId" value={{obj.id}} type="number" hidden>
+                </form>
+            </td>
+            {% else %}
+            <td style="text-align:center;">{{obj.responsetext}}</td>
+            <td style="text-align:center;">{{obj.resDatetime}}</td>
+            <td style="text-align:center;">{{obj.auth_user}}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+</article>
+</html>

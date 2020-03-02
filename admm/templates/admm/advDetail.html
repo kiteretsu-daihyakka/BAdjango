@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adv Detail</title>
+    {% load staticfiles %}
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <link href="{% static 'admm/mycss/univeral.css' %}?{% now 'U' %}" type='text/css' rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'admm/fontawesome-free-5.12.0-web/css/all.css' %}">
+    <style>
+        #advImages img{
+            height:150px;
+            width:150px;
+        }
+        h1{
+            color:darkblue;
+            font-size:25px;
+        }
+        #advDetail th{
+            text-align:left;
+        }
+    </style>
+</head>
+        {% include 'admm/header.html' %}
+        {% include 'admm/leftSideBar.html' %}
+<article style="">
+    <table>
+        <tr>
+            <td><a href="{% url 'admm:adv_edit' advObj.advid  %}"><i class="fa fa-edit"></i></a></td>
+            <td><a href="{% url 'admm:adv_del' advObj.advid %}"><i class="fa fa-trash"></i></a></td>
+        </tr>
+    </table>
+    <table id="advImages">
+        <tr>
+            <th><h1>IMAGES</h1></th>
+        </tr>
+        <tr>
+            {% for advImgObj in advImgObjects %}
+                <td><img src="{{advImgObj.adv_img.url}}" alt="adv img"></td>
+            {% endfor%}
+        </tr>
+    </table>
+    <table id="advDetail">
+        <tr>
+            <th colspan="2"><h1>ADVERTISEMENT DETAIL</h1></th>
+        </tr>
+        {% if catid == 1  %}
+            <tr>
+                <th>Registration No.</th>
+                <td>{{advObj.advregno}}</td>
+            </tr>
+        {% endif %}
+        <tr>
+            <th>Height</th>
+            <td>{{advObj.height}}</td>
+        </tr>
+        <tr>
+            <th>Width</th>
+            <td>{{advObj.width}}</td>
+        </tr>
+        <!--<tr>-->
+            <!--<th>Max Days of booking</th>-->
+            <!--<td>{{advObj.maxdays}}</td>-->
+        <!--</tr>-->
+
+        {% if catid == 1  %}
+            <tr>
+                <th>Address</th>
+                <td>{{advObj.addressline1}}</td>
+            </tr>
+            <tr>
+                <th>Area</th>
+                <td>{{advObj.area_areaid}}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <th>City</th>
+                <td>{{advObj.city_cityid}}</td>
+            </tr>
+            <tr>
+                <th>Minimum order limit</th>
+                <td>{{advObj.minquantity}}</td>
+            </tr>
+            <tr>
+                <th>Stock</th>
+                <td>{{advObj.stock}}</td>
+            </tr>
+        {% endif %}
+
+        <tr>
+            <th>Subcategory</th>
+            <td>{{advObj.subcategory_subcatid}}</td>
+        </tr>
+        <tr>
+            <th>Seller </th>
+            <td>{{advObj.auth_user}}</td>
+        </tr>
+
+    </table>
+    <table style="text-align:center;">
+        <tr>
+            <th colspan="2"><h1>PRICING INFO</h1></th>
+        </tr>
+        <tr>
+            <th>Days</th>
+            <th>Price</th>
+        </tr>
+        {% for priceObj in priceObjects %}
+            <tr>
+                    <td>{{priceObj.noofdays}}</td>
+                    <td>{{priceObj.price}}</td>
+            </tr>
+        {% endfor%}
+    </table>
+</article>
+</html>

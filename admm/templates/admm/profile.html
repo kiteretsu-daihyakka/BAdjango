@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load staticfiles %}
+    <title>My Profile</title>
+    <link rel="stylesheet" href="{% static 'admm/fontawesome-free-5.12.0-web/css/all.css' %}">
+    <link href="{% static 'admm/mycss/index.css' %}?{% now 'U' %}" type='text/css' rel="stylesheet" />
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'admm/adminJquery.js' %}" rel="script"></script>
+    <style>
+        table{
+            margin-left:auto;
+            margin-right:auto;
+            width:400px;
+            background-color:white;
+        }
+        td {
+            padding:10px;
+        }
+    </style>
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+
+<article>
+
+        <div>
+            <p>
+                <br>
+                {% for message in messages %}
+                    {{message}}
+                {% endfor %}
+            </p>
+        </div>
+        <table >
+            <tr>
+                <td>First Name </td>
+                <td>{{user.first_name}}</td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td>{{user.last_name}}</td>
+            </tr>
+            <tr>
+                <td>Mobile No.</td>
+                <td>{{user.mobile}}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{user.email}}</td>
+            </tr>
+            <tr>
+                <td>Address</td>
+                <td>{{user.addressline1}}</td>
+                <td>{{user.secque}}</td>
+            </tr>
+            <tr>
+                <td>The date you joined</td>
+                <td>{{user.date_joined}}</td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td>&#9679;&#9679;&#9679;&#9679;<a href="{% url 'login:chngPwd' %}" style="float:right;">Edit</a></td>
+            </tr>
+                <!--<td>{{user.firstname}}</td>-->
+            <tr>
+                <td colspan="2" style="text-align:center;padding-top:5px;font-size:large;"><a href="{% url 'login:logout' %}" style="text-decoration:none;">Logout</a></td>
+            </tr>
+        </table>
+</article>
+</html>

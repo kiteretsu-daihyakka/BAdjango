@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders</title>
+    <style>
+        h1{
+            color:darkblue;
+        }
+        .ordrsLstTblRow td{
+            padding-top:20px;
+        }
+         .bgColor{
+            background-color:lightgray;
+        }
+    </style>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'admm/fontawesome-free-5.12.0-web/css/all.css' %}">
+    <!--<link href="{% static 'admm/css/bootstrap.min.css' %}" type='text/css' rel="stylesheet" />-->
+    <link href="{% static 'admm/mycss/index.css' %}" type='text/css' rel="stylesheet" />
+    <link href="{% static 'admm/mycss/universal.css' %}" type='text/css' rel="stylesheet" />
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <script>
+        $(document).ready(function(){
+            <!--$('#cncldOrdrChckBx').click(function(){-->
+                <!--$('#cnclOrdrLink').click();-->
+            <!--});-->
+            $('#fltrBtn').click(function(){
+                $('.fltrTd').toggle('fast');
+                $('.fltrTbl').toggleClass('bgColor');
+            });
+            $('#Not_srvd').click(function(){
+                $('#id_srvdOnes').val(0);
+                $('#sbmtBtnSrvdOnes').click();
+            });
+            $('#srvd').click(function(){
+                $('#id_srvdOnes').val(1);
+                $('#sbmtBtnSrvdOnes').click();
+            });
+        });
+    </script>
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+<article>
+    <h1 style="width:100%;text-align:center;">Orders</h1>
+        <table class="fltrTbl" style="width:100%;height:50px;">
+            <tr>
+                <td class="fltrTd" hidden></td>
+                <td class="fltrTd" hidden><a id="ordrLstLink" href="{% url 'admm:list_cncld_odrs' %}" style="color:green;text-decoration:underline;">See Cancelled Orders</a></td>
+                <td id="fltrBtn" style="text-align:right;cursor:pointer;"><span style="font-size:20px;">Filter</span> <i class="fas fa-filter"></i></td>
+            </tr>
+        </table>
+    <br>
+    <form hidden action=""  method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input id="id_srvdOnes" name="srvdOnes" type="number" value="0">
+        <button id="sbmtBtnSrvdOnes" type="submit">Send</button>
+    </form>
+    <table style="width:100%;text-align:center;">
+        <tr>
+            <td id="Not_srvd" style="width:50%;height:50px;border:1px solid black;cursor:pointer;{% if flagIsSrvd is 0 %}background-color:lightgray;{% endif %}">Not Served</td>
+            <td id="srvd" style="border:1px solid black;cursor:pointer;{% if flagIsSrvd is 1 %}background-color:lightgray;{% endif %}">Served</td>
+        </tr>
+    </table>
+    <br>
+    <br><br>
+    <table id="ordrsLstTbl" style="width:100%;text-align:center;">
+        <tr>
+            <th></th>
+            <th>OrderId</th>
+            <th>No of Advertisements</th>
+            <th>Date&Time</th>
+            <th>Buyer</th>
+            <th>Discount Amount</th>
+            <th>Total Amount</th>
+        </tr>
+        {% for ordr in ordrObjects %}
+            <tr class="ordrsLstTblRow">
+                <td><a href="{% url 'admm:ordr_detail' ordr.id %}"><i class="fa fa-eye"></i></a></td>
+                <td>{{ordr.id}}</td>
+                <td>{{ordr.noOfAdvs}}</td>
+                <td>{{ordr.orderdatetime}}</td>
+                <td>{{ordr.auth_user}}</td>
+                <td>{{ordr.discountamount}}</td>
+                <td>{{ordr.totalAmnt}}</td>
+            </tr>
+            {% if ordr.coupondetail_couponid is not None %}
+                <tr>
+                    <td colspan="7" style="text-align:right;">Coupon applied <a href="{% url 'admm:coupon_detail' ordr.coupondetail_couponid %}"><i class="fa fa-info-circle" style="font-size:14px;"></i></a> </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+    <br>
+    <br>
+    <br>
+    <br>
+</article>
+</html>

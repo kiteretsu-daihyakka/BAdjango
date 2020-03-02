@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add new Advertisement</title>
+    {% load staticfiles %}
+    <style>
+        .pricingInfoHolderinput{
+            background-color:none;
+            border:0px;
+        }
+        .tmpForm h4{
+            font-size:25px;
+            color:green;
+        }
+
+        select{
+            width:100px;
+        }
+    </style>
+    <link href="{% static 'admm/mycss/universal.css' %}?{% now 'U' %}" type='text/css' rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'admm/fontawesome-free-5.12.0-web/css/all.css' %}">
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <script >
+    $(document).ready(function(){
+        <!--$('#id_subcategory_subcatid').change(function(){-->
+            <!--if($(this).val()=='R' && $(this).attr()[1]=='i'){-->
+                <!--$('#id_advregno,#id_area_areaid').prop('disabled',true);-->
+                <!--$('#id_minquantity,#id_stock,#id_city_cityid').prop('disabled',false);-->
+            <!--}-->
+            <!--else{-->
+                <!--$('#id_minquantity,#id_stock,#id_city_cityid').prop('disabled',true);-->
+                <!--$('#id_advregno,#id_area_areaid').prop('disabled',false);-->
+            <!--}-->
+        <!--});-->
+        $('#price,#days').focus(function(){
+            $('#errZero,#errEmpty').hide();
+        });
+        $('#insrtPricingInfo').click(function(){
+            days=$('#days').val();
+            price=$('#price').val();
+            if (days=='' || price==''){
+                $('#errEmpty').show();
+                return;
+            }
+            if ( days<= 0 ||  price<= 0){
+                <!--alert('enter greater than 0 as value.');-->
+                $('#errZero').show();
+                return;
+            }
+            dayPriceName=$('.daysInput').last().attr('name');
+            countDWP=parseInt(dayPriceName.charAt(4))+1;
+            $('#for_dwp_loopId').val(countDWP);
+            $('#pricingInfoHolder').append("<tr><td><input class='daysInput' value="+$('#days').val()+" name='days"+countDWP.toString()+"' type='number'></td><td><input class='priceInput' value="+$('#price').val()+" name='price"+countDWP.toString()+"' type='number'></td></tr>");
+            <!--$('#pricingInfoHolder td,input').addClass('pricingInfoHolderinput');-->
+            $('#price,#days').val('');
+        });
+        <!--$('#plsImgIcn').click(function(){-->
+            <!--$('.advImgUpld').last().click();-->
+        <!--});-->
+        $('#plsImgIcn').click(function(){
+            var cnt=parseInt($('#for_advImg_loopId').val())+1;
+            $('#imgsHolder').append("<input class='advImgUpld' type='file' accept='images/*' name='advimg"+ cnt.toString() +"'></input><br>");
+            $('#for_advImg_loopId').val(cnt);
+        });
+        $('#stateDD').change(function(){
+            $('#ctDD').empty();
+            $('#ctDD').append("<option value=0 selected></option>");
+            $('#arDD').empty();
+            $('#arDD').append("<option value=0 selected></option>");
+            var stateId=$(this).val();
+            if (stateId==''){
+                return;
+            }
+            $.ajax({
+                url:'{% url 'admm:location_citiObjs' %}',
+                data:{
+                    'id':stateId,
+                },
+                dataType:'json',
+                success: function (data){
+                    console.log(data);
+                    $('#ctDD').empty();
+                    $('#ctDD').append("<option value=0 ></option>");
+                    for(var i=0;i<data['ctObjs'].length;i++){
+                        $('#ctDD').append("<option value='"+data['ctObjs'][i]['id']+"' >"+data['ctObjs'][i]['cityname']+"</option>");
+                    }
+                }
+            });
+        });
+        $('#ctDD').change(function(){
+            $('#arDD').empty();
+            $('#arDD').append("<option value=0 selected></option>");
+            var ctId=$(this).val();
+            if (ctId==''){
+                return;
+            }
+            $.ajax({
+                url:'{% url 'admm:location_areaObjs' %}',
+                data:{
+                    'id':ctId,
+                },
+                dataType:'json',
+                success: function (data){
+                    console.log(data);
+                    $('#arDD').empty();
+                    $('#arDD').append("<option value=0 ></option>");
+                    for(var i=0;i<data['arObjs'].length;i++){
+                        $('#arDD').append("<option value='"+data['arObjs'][i]['id']+"' >"+data['arObjs'][i]['areaname']+"</option>");
+                    }
+                }
+            });
+        });
+        $('#categoryDD').change(function(){
+            var cat=$('#categoryDD option:selected').text();
+            if (cat==''){
+                $('#subcategoryDD').empty();
+                $('#subcategoryDD').append("<option value='' ></option>");
+                return;
+            }
+            if(cat=='Hoarding'){
+                $('.hoardingFild').show();
+                $('.rickFilds').hide();
+                $('.rickFilds input,select').prop('required',false);
+                $('.hoardingFild input,textarea,select').prop('required',true);
+            }
+            else if(cat=='Rickshaw'){
+                $('.hoardingFild').hide();
+                $('.hoardingFild input,textarea,select').prop('required',false);
+                $('.rickFilds').show();
+                $('.rickFilds input,select').prop('required',true);
+            }
+            $.ajax({
+                url:'{% url 'admm:subCatsDD' %}',
+                data:{
+                    'id':$(this).val(),
+                },
+                dataType:'json',
+                success: function (data){
+                    console.log(data);
+                    $('#subcategoryDD').empty();
+                    $('#subcategoryDD').append("<option value='' ></option>");
+                    for(var i=0;i<data['subCats'].length;i++){
+                        <!--alert(obj['statename']);-->
+                        $('#subcategoryDD').append("<option value='"+data['subCats'][i]['id']+"' >"+data['subCats'][i]['subcatname']+"</option>");
+                    }
+                }
+            });
+        });
+    });
+    </script>
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+<article>
+<div style="position:fixed;background-color:white;text-align:center;width:100%;margin-top:-10px;">
+    <h1 style="color:green;margin-right:300px;">Add New Advertisement</h1>
+</div>
+    {%for msg in messages%}
+        {{msg}}
+    {%endfor%}
+<form action="" method="post" enctype="multipart/form-data" class="tmpForm">
+    {% csrf_token %}
+
+    <br>
+    <br>
+    <!--Image section-->
+    <br>
+    <div style="padding-right:100px;">
+        <h4>Advertisement Detail</h4>
+        <table style="text-align:left;">
+            <tr>
+                <th>Category</th>
+                <td>
+                    <select id="categoryDD" required>
+                        <option value=''></option>
+                        {% for cat in categories %}
+                            <option value={{cat.id}} >{{cat.categoryname}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Subcategory</th>
+                <td>
+                    <select id="subcategoryDD" required name="subCat">
+                        <option value=''></option>
+                    </select>
+                </td>
+            </tr>
+            <tr class="hoardingFild">
+                <th>Advertisement Reg. No.</th>
+                <td><input type="text" required name="advregno"></td>
+            </tr>
+            <tr>
+                <th>Height</th>
+                <td><input type="number" required name="height"></td>
+            </tr>
+            <tr>
+                <th>Width</th>
+                <td><input type="number" required name="width"></td>
+            </tr>
+            <tr class="rickFilds">
+                <th>Minimum Quantity</th>
+                <td><input type="number" required name="minQntt"></td>
+            </tr>
+            <tr class="rickFilds">
+                <th>Stock</th>
+                <td><input type="number" required name="stok"></td>
+            </tr>
+            <tr class="hoardingFild">
+                <th>Address</th>
+                <td><textarea required name="addrs"></textarea></td>
+            </tr>
+            <tr>
+                <th>State</th>
+                <td>
+                    <select id="stateDD" required>
+                        <option value='' ></option>
+                        {% for state in sts %}
+                            <option value={{state.id}} >{{state.statename}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>City</th>
+                <td>
+                    <select id="ctDD" required name="citi">
+                        <option value='' ></option>
+                    </select>
+                </td>
+            </tr>
+            <tr class="hoardingFild">
+                <th>Area</th>
+                <td>
+                    <select id="arDD" required name="aria">
+                        <option value=''></option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+    <div>
+        <h4>Images</h4>
+        <div id="imgsHolder" style="">
+            <!--name="advimg0"-->
+            <input id="for_advImg_loopId" type="number" name="for_advImg_loop" value=1  hidden>
+            <input type="file"  accept="image/*" class="advImgUpld" name="advimg1"  required  ><!--oninvalid="this.setCustomValidity('Select atleast one image')"-->
+            <span id="plsImgIcn" style="margin-top:44px;cursor:pointer;">&plus;</span><br>
+
+        </div>
+
+    </div>
+    <div >
+    <h4>Pricing Info:</h4>
+    <br>
+    <input id="days" type="number" oninput="this.setCustomValidity('')" placeholder="Number of days" >&nbsp;&nbsp;
+    <input id="price" type="number" placeholder="Price for that many days" >
+    <button type="button" id="insrtPricingInfo" >Insert</button>
+    <p id="errEmpty" hidden>Enter values.</p>
+    <p id="errZero" hidden>Enter values greater than zero.</p>
+
+    <table id="pricingInfoHolder" >
+        <tr>
+            <th >Days</th>
+            <th >Price</th>
+        </tr>
+        <tr hidden>
+            <td><input class="daysInput" name="days0" value='0'></td>
+            <td><input class="priceInput" name="price0" value='0'></td>
+        </tr>
+    </table>
+    </div>
+    <br>
+    <input id="for_dwp_loopId" type="number" name="for_dwp_loop" value=0 hidden>
+    <br>
+        <button type="submit" style="height:40px;margin-left:20px;">Save Advertisement</button>
+        <br><br><br><br>
+</form>
+</article>
+</html>
+
+
+
+
+
+
+
+

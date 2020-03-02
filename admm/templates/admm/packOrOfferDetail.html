@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if packOffr == 'package' %}Package{%else%}Offer{%endif%} Detail</title>
+    {% load staticfiles %}
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+
+    <style>
+        h3{
+            color:green;
+        }
+
+        h4{
+            margin:0px;
+        }
+    </style>
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+<article>
+    <div>
+
+    </div>
+    <h3>
+       {% if packOffr == 'package' %}Package{%else%}Offer{%endif%} Detail
+    </h3>
+    <table style="width:40%;height:140px;">
+        <tr>
+            <td><h4>Id</h4></td>
+            <td>{{obj.id}}</td>
+        </tr>
+        <tr>
+            <td><h4>Description</h4></td>
+            <td>{{obj.description}}</td>
+        </tr>
+        <tr>
+            <td><h4>Discount</h4></td>
+            <td>{{obj.discount}}</td>
+        </tr>
+        <tr>
+            <td><h4>Start Date</h4></td>
+            <td>{{obj.startdate}}</td>
+        </tr>
+        <tr>
+            <td><h4>End Date</h4></td>
+            <td>{{obj.enddate}}</td>
+        </tr>
+        <!--<tr>-->
+            <!--<td>Date and Time</td>-->
+            <!--<td>{{ordrObj.orderdatetime}}</td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td>Date and Time</td>-->
+            <!--<td>{{ordrObj.orderdatetime}}</td>-->
+        <!--</tr><tr>-->
+            <!--<td>Date and Time</td>-->
+            <!--<td>{{ordrObj.orderdatetime}}</td>-->
+        <!--</tr>-->
+
+    </table>
+    <br>
+    <h3>Advertisements</h3>
+    <table style="width:80%;text-align:center;">
+        <tr>
+            <th>View</th>
+            <th>Id</th>
+            <th>Quantity</th>
+        </tr>
+        {% for subObj in subObjs %}
+            <tr>
+                <td><a href="{% url 'admm:adv_detail' subObj.advertisement_advid %}"><i class="fa fa-eye"></i></a></td>
+                <td>{{subObj.advertisement_advid}}</td>
+                <td>{{subObj.quantity}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</article>
+</html>

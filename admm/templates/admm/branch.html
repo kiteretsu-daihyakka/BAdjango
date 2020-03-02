@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Branch</title>
+    <style>
+        .heading{
+            font-weight:bold;
+        }
+        table{
+            <!--border:1px solid black;-->
+        }
+        .branches td{
+            padding:20px;
+            <!--border:1px solid black;-->
+        }
+        .address,.mobile_no{
+            border:None;
+            outline:none;
+            width:300px;
+            height:50px;
+        }
+        textarea{
+            height:50px;
+            resize:none;
+        }
+        .address,.mobile_no:focus{
+            <!--border:1px solid black;-->
+        }
+        a{
+            color:black;
+        }
+        a:hover{
+            color:green;
+        }
+    </style>
+    {% load staticfiles %}
+    <link href="{% static 'admm/mycss/index.css' %}?{% now 'U' %}" type='text/css' rel="stylesheet" />
+    <script src="{% static 'admm/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'admm/adminJquery.js' %}" rel="script"></script>
+    <link rel="stylesheet" href="{% static 'admm/fontawesome-free-5.12.0-web/css/all.css' %}">
+    <script>
+        $(document).ready(function(){
+            $('.editBranch').click(function(){
+                var indx=$(this).attr('id');
+                var id=(indx.match(/(\d+)/))[0];
+                var tmpSelector='id_address'+id;
+                $('#'+tmpSelector).prop('readonly',false);
+                $('#'+tmpSelector).css('border','1px solid black');
+                $('#'+tmpSelector).focus();
+                var tmpSelector='id_mobileno'+id;
+                $('#'+tmpSelector).prop('readonly',false);
+                $('#'+tmpSelector).css('border','1px solid black');
+            });
+            $('.address,.mobile_no').change(function(){
+                $(this).next('button').click();
+            });
+            $('.mobile_no').focusout(function(){
+                $('.mobile_no').css('border','none');
+                $(this).prop('readonly',true);
+            });
+            $('.address').focusout(function(){
+                $('.address').css('border','none');
+                $(this).prop('readonly',true);
+            });
+            $('#NewBrnchLink').click(function(){
+                $('#newBrnchFrm').slideToggle();
+            });
+            <!--$('#CityId').change(function(){-->
+                <!--loadArea=()=>{-->
+                    <!--var ctId=document.getElementById('CityId');-->
+                    <!--console.log(categoryId)-->
+
+                    <!--var arId=document.getElementById('id_areaid');-->
+                    <!--var ajax=new XMLHttpRequest()-->
+                    <!--console.log('ajax',ajax)-->
+                    <!--ajax.onreadystatechange=()=>{-->
+                        <!--if (ajax.readyState==4){-->
+                            <!--let json=JSON.parse(ajax.responseText)-->
+                            <!--console.log('json',json)-->
+                            <!---->
+                            <!--for (let i=0;i<json.length;i++){-->
+                                <!--let option=document.createElement('option')-->
+                                <!--option.value=json[i].id;-->
+                                <!--console.log(option.text);-->
+                                <!--console.log(option.value);-->
+                                <!--arId=-->
+                            <!--}-->
+                        <!--}-->
+                    <!--}-->
+                <!--}-->
+            <!--});-->
+        });
+
+    </script>
+    <script type="text/javascript">
+        $(document).on('submit','#newBrnchFrm',function(e){
+            e.preventDefault();
+            $.ajax({
+                type:'POST',
+                url:'/adminsite/branch/'
+                data:{
+                    ctId:$('#CityId').val()),
+                },
+                success:function(){
+                    alert('succeeded');
+                }
+            });
+        });
+    </script>
+</head>
+{% include 'admm/header.html' %}
+{% include 'admm/leftSideBar.html' %}
+
+<article >
+        <h2>Branches</h2>
+        <div style="direction:rtl;margin:20px;">
+        <span id="NewBrnchLink" style="color:green;text-decoration:underline;cursor:pointer;">Add New</span>
+    </div>
+        <form id="newBrnchFrm" action="" method="post" hidden>
+            {% csrf_token %}
+            {{branch_form.as_table}}
+            City:
+            <select id="CityId" required>
+                <option></option>
+                {% for ct in ctObs %}
+                    <option value="{{ct.id}}">{{ct.cityname}}</option>
+                {% endfor %}
+            </select>
+            <!--<button onclick="">change url</button>-->
+            <button type="submit" id="brnchSbmt">Insert</button>
+        </form>
+            {% for object in objects%}
+                      <form class="branches" action="edit/{{object.id}}/" method="post" >
+                          {% csrf_token %}
+                        <table>
+                            {% if forloop.counter is 1 %}
+                            <tr>
+                                 <td></td>
+                                 <td></td>
+                                 <td class="heading">Address</td>
+                                 <td class="heading">Mobile No.</td>
+                                 <td class="heading">View Admins</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td><a href="{% url 'admm:branch-del' object.id %}"><i class="fa fa-trash"></i></a></td>
+                                <td><a id="edit{{object.id}}" class="editBranch"><i class="fa fa-edit"></i></a></td>
+                                <td><textarea id="id_address{{object.id}}" class="address"  name="branch_address{{object.id}}" readonly>{{object.branchaddress}}</textarea><button type="submit" hidden>d</button> </td>
+                                <td><input id="id_mobileno{{object.id}}" class="mobile_no" value="{{object.mobileno}}" name="mobileno{{object.id}}" readonly > <button type="submit" hidden>d</button> </td>
+                                <td style="text-align:center;width:120px;"><a href="{% url 'admm:branch_admin' object.id %}"><i class="fa fa-eye"></i></a></td>
+                            </tr>
+                        </table>
+                      </form>
+            {% endfor %}
+
+        <br>
+        <br>
+        <br>
+</article>
+</html>
