@@ -1,0 +1,31 @@
+/* leftSideBar.html*/
+.leftSideBarBtn{
+            cursor:pointer;
+        }
+        .menuOptions{
+            height:50%;
+            padding-left:30px;
+            cursor:pointer;
+        }
+
+        .menuOptions span:hover{
+            color:green;
+            text-decoration:underline;
+        }
+        .backGRND{
+            background-color:white;
+        }
+        .leftSideBarMenuNdBtn,.menuOptions{
+            width:200px;
+            background-color:lightgray;
+        }
+        .leftSideBar{
+            top:140px;
+            padding-bottom:140px;
+            margin-right:140px;
+            position:fixed;
+            float:left;
+
+            /*width:200px;*/
+            /*border:1px solid black;*/
+        }

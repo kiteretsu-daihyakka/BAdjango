@@ -1,0 +1,26 @@
+/*for all*/
+        a:hover{
+            text-decoration:underline;
+            color:green;
+        }
+        a{
+        cursor:pointer;
+            color:black;
+            text-decoration:none;
+        }
+        article{
+            margin-top:100px;
+            margin-left:250px;
+        }
+        form button{
+            margin-left:60px;
+            height:40px;
+            width:170px;
+        }
+        h1,h2,h3{
+            color:green;
+            text-align:center;
+        }
+        h1{
+            MARGIN-RIGHT:110PX;
+        }

@@ -1,0 +1,29 @@
+/* header.html */
+#tableContents div{
+            float:left;
+            padding-bottom:30px;
+        }
+        #myAc{
+            cursor:pointer;
+            font-family:Novecento sans;
+        }
+        #myAcPanel{
+            width:170px;
+            text-align:left;
+            font-family:Novecento sans;
+            <!--border:1px solid black;-->
+        }
+        #myAcPanel{
+            position:fixed;
+            <!--border:1px solid black;-->
+        }
+        header{
+            top:0;
+            position:fixed;
+            width:100%;
+
+        }
+        .logo{
+            height:50px;
+            margin-left:-6px;
+        }
